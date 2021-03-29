@@ -5,7 +5,7 @@ export type ProductDocument = Product & Document
 
 @Schema()
 export class Product {
-    @Prop()
+    @Prop({ required: true })
     id: number
 
     @Prop({ required: true })
@@ -14,7 +14,7 @@ export class Product {
     @Prop({ required: true })
     image: string
 
-    @Prop()
+    @Prop({ default: 0 })
     likes: number
 }
 export const ProductSchema = SchemaFactory.createForClass(Product)

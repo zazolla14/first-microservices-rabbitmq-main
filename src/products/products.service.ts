@@ -13,8 +13,6 @@ export class ProductsService {
     ) {}
 
     async create(createProductDto: CreateProductDto): Promise<Product> {
-        console.log(createProductDto)
-
         return new this.productModel(createProductDto).save()
     }
 
@@ -27,14 +25,10 @@ export class ProductsService {
     }
 
     async update(id: number, updateProductDto: UpdateProductDto): Promise<any> {
-        console.log(updateProductDto)
-
         return this.productModel.findOneAndUpdate({ id }, updateProductDto)
     }
 
     async remove(id: number): Promise<void> {
-        console.log(id)
-
         await this.productModel.deleteOne({ id })
     }
 }

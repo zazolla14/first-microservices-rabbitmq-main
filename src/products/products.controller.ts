@@ -6,6 +6,7 @@ import {
     Patch,
     Param,
     Delete,
+    // HttpService,
 } from '@nestjs/common'
 import { ProductsService } from './products.service'
 import { CreateProductDto } from './dto/create-product.dto'
@@ -14,23 +15,30 @@ import { EventPattern } from '@nestjs/microservices'
 
 @Controller('products')
 export class ProductsController {
-    constructor(private readonly productsService: ProductsService) {}
+    constructor(
+        private readonly productsService: ProductsService, // private httpService: HttpService,
+    ) {}
 
     @Post()
     create(@Body() createProductDto: CreateProductDto) {
         return this.productsService.create(createProductDto)
     }
 
-    // @Patch(':id/like')
-    // async like(@Param('id') id: number) {
-    //     const product = await this.productsService.findOne(id)
-    //     return this.productsService.update(id, {})
-    // }
-
     @EventPattern('create_product')
-    async create_product(createProductDto: CreateProductDto) {
-        console.log(createProductDto)
-        await this.productsService.create(createProductDto)
+    create_product(createProductDto: CreateProductDto) {
+        this.productsService.create(createProductDto)
+    }
+
+    @Post(':id/like')
+    async like(@Param('id') id: number) {
+        const product = await this.productsService.findOne(id)
+        product.likes++
+        // this.httpService
+        //     .post(`http://localhost:8000/api/products/${id}/like`, {})
+        //     .subscribe((res) => {
+        //         console.log(res)
+        //     })
+        return this.productsService.update(id, product)
     }
 
     @Get()
@@ -52,8 +60,8 @@ export class ProductsController {
     }
 
     @EventPattern('update_product')
-    async update_product(updateProduct: UpdateProductDto) {
-        await this.productsService.update(updateProduct.id, updateProduct)
+    update_product(updateProduct: UpdateProductDto) {
+        this.productsService.update(updateProduct.id, updateProduct)
     }
 
     @Delete(':id')
@@ -63,8 +71,6 @@ export class ProductsController {
 
     @EventPattern('delete_product')
     async delete_product(id: number) {
-        console.log(id)
-
-        await this.productsService.remove(id)
+        await this.productsService.remove(+id)
     }
 }
